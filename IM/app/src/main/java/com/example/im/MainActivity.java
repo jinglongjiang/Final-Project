@@ -14,8 +14,7 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
     private Button addButton,uploadButton,onepic,album;
-    private ImageView menu;
-    private boolean isCamera=false;
+    private ImageView menu,mypic;
     private File tempFile;
     private int PHOTO_FROM_ALBUM=1;
 
@@ -74,10 +73,11 @@ public class MainActivity extends AppCompatActivity {
         album.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                isCamera=false;
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
                 startActivityForResult(intent,PHOTO_FROM_ALBUM);
+                mypic = (ImageView) findViewById(R.id.mypic);
+                mypic.setVisibility(View.VISIBLE);
             }
         });
     }
