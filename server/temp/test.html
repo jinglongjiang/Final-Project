@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="static/script/jquery-3.5.1.min.js"></script>
+    </head>
+    <body>
+        <input type="file" name="uploadfile" id="btn_file" accept="*" value="">
+        <div id='upload'>123</div>
+        <div id="succ"></div>
+        <script>
+            $('#upload').click(function(){
+                var myfile = $('#btn_file')[0].files[0];
+                var formdata = new FormData();
+                formdata.append('file',myfile)
+                $.ajax({
+                    url: 'upload',
+                    type: 'post',
+                    processData:false,
+                    contentType:false,
+                    data: formdata,
+                    success:function(data){
+                        console.log(data)
+                    }
+                })
+            });
+        </script>
+    </body>
+</html>
