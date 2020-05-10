@@ -69,8 +69,11 @@ public class PictureView extends AppCompatActivity {
         RequestParams params = new RequestParams();
 
         try {
-            params.put("file",new File(srcPath));
-
+            System.out.println("00000000000");
+            File file = new File(srcPath);
+            System.out.println(file);
+            params.put("image",file);
+            System.out.println("111111111111");
             hasSdcard();
             client.post(url, params, new AsyncHttpResponseHandler() {
 
