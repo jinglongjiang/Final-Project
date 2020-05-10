@@ -11,29 +11,20 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.apache.http.Header;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.squareup.okhttp.MediaType;
-
-import org.json.JSONArray;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 
 
@@ -44,7 +35,7 @@ public class PictureView extends AppCompatActivity {
     private boolean success = false;
     ImageView imageView;
     TextView textView;
-    private String url = "http://10.0.2.2:8000/upload";
+    private String url = "http://www.zhangmingzhe.cn:8090/upload";
     private final int REQUEST_EXTERNAL_STORAGE = 1;
     private  String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -61,6 +52,11 @@ public class PictureView extends AppCompatActivity {
 
         imageView.setImageURI(photoUri);
         verifyStoragePermissions(this);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         connectServer();
     }
 
@@ -69,11 +65,9 @@ public class PictureView extends AppCompatActivity {
         RequestParams params = new RequestParams();
 
         try {
-            System.out.println("00000000000");
             File file = new File(srcPath);
             System.out.println(file);
             params.put("image",file);
-            System.out.println("111111111111");
             hasSdcard();
             client.post(url, params, new AsyncHttpResponseHandler() {
 
