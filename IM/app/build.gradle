@@ -20,6 +20,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+    useLibrary 'org.apache.http.legacy'
 
 }
 
@@ -34,4 +40,6 @@ dependencies {
     implementation 'com.squareup.okhttp:okhttp-android-support:2.7.5'
     implementation 'com.squareup.okio:okio:2.6.0'
     implementation 'com.squareup.okhttp3:okhttp:4.6.0'
+    compile files('libs/android-query-full.0.26.7.jar')
+    compile files('libs/android-async-http-1.4.6.jar')
 }
