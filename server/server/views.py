@@ -101,8 +101,7 @@ def upload(request):
   for node_id in top_5:
       human_string = node_lookup.id_to_string(node_id)
       a.append(human_string)
-      score = predictions[node_id]
-      print(human_string,score)
+      print(human_string)
   
   sess.close()
   return HttpResponse(a[0])
@@ -112,7 +111,7 @@ def cut(request):
     'https://api.remove.bg/v1.0/removebg',
     files={'image_file': open('images/a.jpeg', 'rb')},
     data={'size': 'auto'},
-    headers={'X-Api-Key': '37DewWLXcs7TF8yJR3RrMRQK'},
+    headers={'X-Api-Key': 'YDam8WFr2B3qD8TNJacwQgjc'},
   )
   if response.status_code == requests.codes.ok:
     with open('images/a.png', 'wb') as out:

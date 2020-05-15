@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
@@ -19,13 +19,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 
 
@@ -36,7 +42,7 @@ public class PictureCompose extends AppCompatActivity {
     private Bitmap madeupImage,uploadImage,resultImage;
     Button back,download,upload;
     private int PHOTO_FROM_ALBUM=1;
-    float l=0,t=0,scale;
+    float l=0,t=0;
     View img;
 
 
@@ -124,7 +130,7 @@ public class PictureCompose extends AppCompatActivity {
                         y2 = event.getY();
                         l = x2 - x1;
                         t = y2 - y1;
-                        resultImage = compositeImages(uploadImage,madeupImage,l,t,scale);
+                        resultImage = compositeImages(uploadImage,madeupImage,l,t);
                         image.setImageBitmap(resultImage);
                         break;
                     case MotionEvent.ACTION_UP:
@@ -133,17 +139,27 @@ public class PictureCompose extends AppCompatActivity {
                     case MotionEvent.ACTION_CANCEL:
                         System.out.println(event);
                         break;
-                    case MotionEvent.ACTION_POINTER_DOWN:
-
                     default:
                         break;
                 }
                 return true;
             }
         });
+        download = findViewById(R.id.download);
+        download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    createImageFile();
+                    finish();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
-    private static Bitmap compositeImages(Bitmap srcBitmap,Bitmap dstBitmap,float left,float top,float scale){
+    private static Bitmap compositeImages(Bitmap srcBitmap,Bitmap dstBitmap,float left,float top){
 
         Bitmap bmp = null;
         bmp = Bitmap.createBitmap(srcBitmap.getWidth(), srcBitmap.getHeight(), srcBitmap.getConfig());
@@ -151,11 +167,7 @@ public class PictureCompose extends AppCompatActivity {
         Canvas canvas = new Canvas(bmp);
         canvas.drawBitmap(srcBitmap, 0, 0, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-        Matrix matrix = new Matrix();
-        matrix.postScale(scale, scale);
-        Bitmap newbm = Bitmap.createBitmap(dstBitmap, 0, 0, dstBitmap.getWidth(), dstBitmap.getHeight(), matrix,
-                true);
-        canvas.drawBitmap(newbm, left, top, paint);
+        canvas.drawBitmap(dstBitmap, left, top, paint);
         return bmp;
     }
 
@@ -165,11 +177,34 @@ public class PictureCompose extends AppCompatActivity {
         Uri uri = data.getData();
         try {
             uploadImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-            resultImage = compositeImages(uploadImage,madeupImage,l,t,scale);
+            resultImage = compositeImages(uploadImage,madeupImage,l,t);
             image.setImageBitmap(resultImage);
         } catch (IOException e) {
             System.out.println(e);
             e.printStackTrace();
         }
+    }
+
+    private void createImageFile() throws IOException {
+
+        // 이미지 파일 이름
+        String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
+        String imageFileName = "IM_" + timeStamp + ".jpg";
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/IM/";
+
+        // 이미지가 저장될 폴더 이름
+        File storageDir = new File(path);
+        if (!storageDir.exists()) storageDir.mkdirs();
+
+
+        File file = new File(path, imageFileName);
+        OutputStream fOut = new FileOutputStream(file);
+        resultImage.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+        fOut.close();
+
+        MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), file.getName(), file.getName());
+
+        Toast toast = Toast.makeText(getApplicationContext(), path + " succeed!", Toast.LENGTH_SHORT);
+        toast.show();
     }
 }
