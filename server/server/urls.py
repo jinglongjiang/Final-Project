@@ -19,5 +19,6 @@ from . import views
 
 urlpatterns = [
     path('',views.admin),
-    path('upload',views.upload)
+    path('upload',views.upload),
+    path('cut',views.cut)
 ]

@@ -1,8 +1,6 @@
 package com.example.im;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +8,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,7 +17,6 @@ import org.apache.http.Header;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -37,6 +36,7 @@ public class PictureView extends AppCompatActivity {
     ImageView imageView;
     TextView textView;
     private String url = "http://www.zhangmingzhe.cn:8090/upload";
+    Button next;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +56,7 @@ public class PictureView extends AppCompatActivity {
         }
 
         connectServer();
+        gotonext();
     }
 
     private void connectServer() {
@@ -64,7 +65,6 @@ public class PictureView extends AppCompatActivity {
 
         try {
             File file = new File(srcPath);
-            System.out.println(file);
             params.put("image",file);
             hasSdcard();
             client.post(url, params, new AsyncHttpResponseHandler() {
@@ -128,4 +128,17 @@ public class PictureView extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void gotonext(){
+        next = (Button) findViewById(R.id.next_button);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(PictureView.this,PictureCompose.class);
+                intent.putExtra("photo",photoUri);
+                startActivity(intent);
+            }
+        });
+    }
+
 }

@@ -81,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
                 startActivityForResult(intent,PHOTO_FROM_ALBUM);
-            }});
+            }
+        });
     }
 
     @Override

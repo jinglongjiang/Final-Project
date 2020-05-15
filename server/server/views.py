@@ -5,8 +5,7 @@ from tensorflow.python.platform import gfile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import tensorflow as tf
 import numpy as np
-import re
-import os
+import re,os,requests
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '0' #use GPU with ID=0
 config = tf.compat.v1.ConfigProto()
@@ -79,31 +78,47 @@ def admin(request):
 
 
 def upload(request):
-    image = request.FILES.get("image")
-    with open("images/"+image.name,'wb') as f:
-      f.write(image.read())
-    
-    image_data = gfile.FastGFile("images/"+image.name, 'rb').read()
-    create_graph()
-    
-    sess=tf.compat.v1.Session()
-    #Inception-v3模型的最后一层softmax的输出
-    softmax_tensor= sess.graph.get_tensor_by_name('softmax:0')
-    #输入图像数据，得到softmax概率值（一个shape=(1,1008)的向量）
-    predictions = sess.run(softmax_tensor,{'DecodeJpeg/contents:0': image_data})
-    #(1,1008)->(1008,)
-    predictions = np.squeeze(predictions)
-    
-    # ID --> English string label.
-    node_lookup = NodeLookup()
-    #取出前5个概率最大的值（top-5)
-    top_5 = predictions.argsort()[-5:][::-1]
-    a = []
-    for node_id in top_5:
-        human_string = node_lookup.id_to_string(node_id)
-        a.append(human_string)
-        print(human_string)
-    
-    sess.close()
-    return HttpResponse(a[0])
+  image = request.FILES.get("image")
+  with open("images/a.jpeg",'wb') as f:
+    f.write(image.read())
+  
+  image_data = gfile.FastGFile("images/a.jpeg", 'rb').read()
+  create_graph()
+  
+  sess=tf.compat.v1.Session()
+  #Inception-v3模型的最后一层softmax的输出
+  softmax_tensor= sess.graph.get_tensor_by_name('softmax:0')
+  #输入图像数据，得到softmax概率值（一个shape=(1,1008)的向量）
+  predictions = sess.run(softmax_tensor,{'DecodeJpeg/contents:0': image_data})
+  #(1,1008)->(1008,)
+  predictions = np.squeeze(predictions)
+  
+  # ID --> English string label.
+  node_lookup = NodeLookup()
+  #取出前5个概率最大的值（top-5)
+  top_5 = predictions.argsort()[-5:][::-1]
+  a = []
+  for node_id in top_5:
+      human_string = node_lookup.id_to_string(node_id)
+      a.append(human_string)
+      score = predictions[node_id]
+      print(human_string,score)
+  
+  sess.close()
+  return HttpResponse(a[0])
 
+def cut(request):
+  response = requests.post(
+    'https://api.remove.bg/v1.0/removebg',
+    files={'image_file': open('images/a.jpeg', 'rb')},
+    data={'size': 'auto'},
+    headers={'X-Api-Key': '37DewWLXcs7TF8yJR3RrMRQK'},
+  )
+  if response.status_code == requests.codes.ok:
+    with open('images/a.png', 'wb') as out:
+        out.write(response.content)
+  else:
+    return HttpResponse("Error:", response.status_code, response.text)
+  with open('images/a.png','rb') as f:
+    image_data = f.read()
+    return HttpResponse(image_data,content_type="image/png")

@@ -26,6 +26,9 @@
         <activity android:name=".PictureView">
 
         </activity>
+        <activity android:name=".PictureCompose">
+
+        </activity>
         <uses-library android:name="org.apache.http.legacy" android:required="false" />
     </application>
 
