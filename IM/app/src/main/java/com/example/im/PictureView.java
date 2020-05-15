@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,10 +37,6 @@ public class PictureView extends AppCompatActivity {
     ImageView imageView;
     TextView textView;
     private String url = "http://www.zhangmingzhe.cn:8090/upload";
-    private final int REQUEST_EXTERNAL_STORAGE = 1;
-    private  String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +48,13 @@ public class PictureView extends AppCompatActivity {
         imageView = (ImageView)findViewById(R.id.img);
 
         imageView.setImageURI(photoUri);
-        verifyStoragePermissions(this);
+
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
         connectServer();
     }
 
@@ -121,14 +119,13 @@ public class PictureView extends AppCompatActivity {
         }
     }
 
-    public void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish(); // back button
+                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }
